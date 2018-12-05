@@ -8,7 +8,6 @@
   "scripts": {
     "test": "npm run test-only",
     "test-only": "nyc mocha build/test",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json",
     "lint": "gts check",
     "clean": "gts clean",
     "compile": "tsc -p .",
@@ -41,10 +40,5 @@
     "sinon": "^7.0.0",
     "source-map-support": "^0.5.6",
     "typescript": "^3.0.0"
-  },
-  "nyc": {
-    "exclude": [
-      "build/test"
-    ]
   }
 }
