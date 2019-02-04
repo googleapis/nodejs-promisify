@@ -247,3 +247,100 @@ describe('promisify', () => {
     });
   });
 });
+
+describe('callbackifyAll', () => {
+  const fakeArgs = [1, 2, 3];
+  const fakeError = new Error('err.');
+
+  // tslint:disable-next-line
+  let FakeClass: any;
+
+  beforeEach(() => {
+    FakeClass = class {
+      async methodName() {
+        return fakeArgs;
+      }
+      async methodError() {
+        throw fakeError;
+      }
+    };
+    FakeClass.prototype.method_ = noop;
+    FakeClass.prototype._method = noop;
+    FakeClass.prototype.methodStream = noop;
+
+    util.callbackifyAll(FakeClass);
+  });
+
+  it('should callbackify the correct method', () => {
+    assert(FakeClass.prototype.methodName.callbackified_);
+    assert(FakeClass.prototype.methodError.callbackified_);
+
+    assert.strictEqual(FakeClass.prototype.method_, noop);
+    assert.strictEqual(FakeClass.prototype._method, noop);
+    assert.strictEqual(FakeClass.prototype.methodStream, noop);
+  });
+
+  it('should optionally accept an exclude list', () => {
+    function FakeClass2() {}
+    FakeClass2.prototype.methodSync = noop;
+    FakeClass2.prototype.method = () => {};
+    util.callbackifyAll(FakeClass2, {
+      exclude: ['methodSync'],
+    });
+    assert.strictEqual(FakeClass2.prototype.methodSync, noop);
+    assert(FakeClass2.prototype.method.callbackified_);
+    assert.strictEqual(FakeClass2.prototype.methodSync, noop);
+  });
+
+  it('should not re-callbackify method', () => {
+    const method = FakeClass.prototype.methodName;
+    util.callbackifyAll(FakeClass);
+    assert.strictEqual(FakeClass.prototype.methodName, method);
+  });
+});
+
+describe('callbackify', () => {
+  let func: Function;
+  // tslint:disable-next-line:no-any
+  let fakeArgs: any[];
+
+  beforeEach(() => {
+    fakeArgs = [1, 2, 3];
+
+    func = util.callbackify(async function(this: {}) {
+      return fakeArgs;
+    });
+  });
+
+  it('should not re-callbackify the function', () => {
+    const original = func;
+    func = util.callbackify(func);
+    assert.strictEqual(original, func);
+  });
+
+  it('should return a promise when callback is not provided', () => {
+    func().then((args: []) => {
+      assert.deepStrictEqual(args, fakeArgs);
+    });
+  });
+
+  it('should call the callback if it is provided', (done) => {
+    func(function(this: {}) {
+      const args = [].slice.call(arguments);
+      assert.deepStrictEqual(args, [null, ...fakeArgs]);
+      done();
+    });
+  });
+
+  it('should call the callback with error when promise rejects', () => {
+    const error = new Error('err');
+    func = util.callbackify(async () => {
+      throw error;
+    });
+    func((err: Error) => {
+      if (err) {
+        assert.strictEqual(err, error);
+      }
+    });
+  });
+});
