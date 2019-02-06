@@ -332,6 +332,27 @@ describe('callbackify', () => {
     });
   });
 
+  it('should call the provided callback with undefined', (done) => {
+    func = util.callbackify(async function(this: {}) {});
+    // tslint:disable-next-line:no-any
+    func((err: Error, resp: any) => {
+      assert.strictEqual(err, null);
+      assert.strictEqual(resp, undefined);
+      done();
+    });
+  });
+
+  it('should call the provided callback with null', (done) => {
+    func = util.callbackify(async function(this: {}) {
+      return null;
+    });
+    func(function(this: {}) {
+      const args = [].slice.call(arguments);
+      assert.deepStrictEqual(args, [null, null]);
+      done();
+    });
+  });
+
   it('should call the callback with error when promise rejects', () => {
     const error = new Error('err');
     func = util.callbackify(async () => {

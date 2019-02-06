@@ -177,7 +177,10 @@ export function callbackify(originalMethod: CallbackMethod) {
     originalMethod
         .apply(context, arguments)
         // tslint:disable-next-line:no-any
-        .then((res: any[]) => cb(null, ...res), (err: Error) => cb(err));
+        .then((res: any) => {
+          res = Array.isArray(res) ? res : [res];
+          cb(null, ...res);
+        }, (err: Error) => cb(err));
   };
   wrapper.callbackified_ = true;
   return wrapper;
