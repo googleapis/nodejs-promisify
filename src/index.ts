@@ -210,8 +210,7 @@ export function callbackifyAll(
   methods.forEach((methodName) => {
     const originalMethod = Class.prototype[methodName];
     if (!originalMethod.callbackified_) {
-      Class.prototype[methodName] =
-          exports.callbackify(originalMethod);
+      Class.prototype[methodName] = exports.callbackify(originalMethod);
     }
   });
 }
