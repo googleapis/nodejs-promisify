@@ -358,11 +358,7 @@ describe('callbackify', () => {
     func = util.callbackify(async () => {
       throw error;
     });
-    func((err: Error) => {
-      if (err) {
-        assert.strictEqual(err, error);
-      }
-    });
+    func((err: Error) => assert.strictEqual(err, error));
   });
 
   it.skip(
