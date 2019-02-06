@@ -211,7 +211,7 @@ export function callbackifyAll(
     const originalMethod = Class.prototype[methodName];
     if (!originalMethod.callbackified_) {
       Class.prototype[methodName] =
-          exports.callbackify(originalMethod, options);
+          exports.callbackify(originalMethod);
     }
   });
 }
