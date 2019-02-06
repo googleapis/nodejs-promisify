@@ -174,11 +174,10 @@ export function callbackify(originalMethod: CallbackMethod) {
 
     const cb = Array.prototype.pop.call(arguments);
 
-    originalMethod.apply(context, arguments)
-        .then((res: []) => {
-          cb(null, ...res);
-        })
-        .catch((err: Error) => cb(err));
+    originalMethod
+        .apply(context, arguments)
+        // tslint:disable-next-line:no-any
+        .then((res: any[]) => cb(null, ...res), (err: Error) => cb(err));
   };
   wrapper.callbackified_ = true;
   return wrapper;

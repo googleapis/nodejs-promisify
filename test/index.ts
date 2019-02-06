@@ -343,4 +343,14 @@ describe('callbackify', () => {
       }
     });
   });
+
+  it.skip(
+      'should call the callback only a single time when the promise resolves but callback throws an error',
+      () => {
+        const error = new Error('err');
+        const callback = sinon.stub().throws(error);
+
+        func(callback);
+        // assert.ok(callback.calledOnce);
+      });
 });
