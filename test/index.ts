@@ -15,7 +15,9 @@
  */
 
 import * as assert from 'assert';
+import * as mocha from 'mocha';
 import * as sinon from 'sinon';
+
 import * as util from '../src';
 
 const noop = () => {};
@@ -361,13 +363,19 @@ describe('callbackify', () => {
     func((err: Error) => assert.strictEqual(err, error));
   });
 
-  it.skip(
-      'should call the callback only a single time when the promise resolves but callback throws an error',
-      () => {
-        const error = new Error('err');
-        const callback = sinon.stub().throws(error);
+  it('should call the callback only a single time when the promise resolves but callback throws an error',
+     () => {
+       const error = new Error('err');
+       const callback = sinon.stub().throws(error);
 
-        func(callback);
-        // assert.ok(callback.calledOnce);
-      });
+       const originalRejection = process.listeners('unhandledRejection').pop();
+       process.removeListener('unhandledRejection', originalRejection!);
+       process.once('unhandledRejection', (err) => {
+         assert.strictEqual(error, err);
+         assert.ok(callback.calledOnce);
+         process.listeners('unhandledRejection').push(originalRejection!);
+       });
+
+       func(callback);
+     });
 });
