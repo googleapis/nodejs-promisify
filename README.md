@@ -29,8 +29,8 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 * [Quickstart](#quickstart)
 
   * [Installing the client library](#installing-the-client-library)
-
-
+  * [Using the client library](#using-the-client-library)
+* [Samples](#samples)
 * [Versioning](#versioning)
 * [Contributing](#contributing)
 * [License](#license)
@@ -43,8 +43,46 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 npm install @google-cloud/promisify
 ```
 
+
+### Using the client library
+
+```javascript
+const {promisify} = require('@google-cloud/promisify');
+
+/**
+ * This is a very basic example function that accepts a callback.
+ */
+function someCallbackFunction(name, callback) {
+  if (!name) {
+    callback(new Error('Name is required!'));
+  } else {
+    callback(null, `Well hello there, ${name}!`);
+  }
+}
+
+// let's promisify it!
+const somePromiseFunction = promisify(someCallbackFunction);
+
+async function quickstart() {
+  // now we can just `await` the function to use it like a promisified method
+  const [result] = await somePromiseFunction('nodestronaut');
+  console.log(result);
+}
+quickstart();
+
+```
 It's unlikely you will need to install this package directly, as it will be
 installed as a dependency when you install other `@google-cloud` packages.
+
+
+## Samples
+
+Samples are in the [`samples/`](https://github.com/googleapis/nodejs-promisify/tree/master/samples) directory. The samples' `README.md`
+has instructions for running the samples.
+
+| Sample                      | Source Code                       | Try it |
+| --------------------------- | --------------------------------- | ------ |
+| Quickstart | [source code](https://github.com/googleapis/nodejs-promisify/blob/master/samples/quickstart.js) | [![Open in Cloud Shell][shell_img]](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/googleapis/nodejs-promisify&page=editor&open_in_editor=samples/quickstart.js,samples/README.md) |
 
 
 
