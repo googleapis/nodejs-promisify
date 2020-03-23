@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function,prefer-rest-params */
-
 // Copyright 2014 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable @typescript-eslint/no-empty-function,prefer-rest-params */
+
 import * as assert from 'assert';
 import {describe, it, afterEach, beforeEach} from 'mocha';
 import * as sinon from 'sinon';
@@ -26,7 +26,6 @@ describe('promisifyAll', () => {
   const fakeArgs = [null, 1, 2, 3];
   const fakeError = new Error('err.');
 
-  // tslint:disable-next-line
   let FakeClass: any;
 
   beforeEach(() => {
@@ -85,7 +84,6 @@ describe('promisifyAll', () => {
       });
     `);
   } catch (error) {
-    // tslint:disable-next-line ban
     it.skip('should work on ES classes');
   }
 
@@ -134,7 +132,6 @@ describe('promisify', () => {
   beforeEach(() => {
     fakeArgs = [null, 1, 2, 3];
     func = util.promisify(function (this: {}, callback: () => void) {
-      // tslint:disable-next-line no-any
       (callback as any).apply(this, fakeArgs);
     });
   });
@@ -146,7 +143,6 @@ describe('promisify', () => {
   });
 
   it('should not return a promise in callback mode', done => {
-    // tslint:disable-next-line:no-any
     let returnVal: any;
     returnVal = func.call(fakeContext, function (this: {}) {
       const args = [...arguments];
@@ -178,7 +174,6 @@ describe('promisify', () => {
   });
 
   it('should allow the Promise object to be overridden', () => {
-    // tslint:disable-next-line:variable-name
     const FakePromise = class {};
     const promise = func.call({Promise: FakePromise});
     assert(promise instanceof FakePromise);
@@ -189,7 +184,6 @@ describe('promisify', () => {
 
     func = util.promisify(
       (callback: () => void) => {
-        // tslint:disable-next-line no-any prefer-rest-params
         (callback as any).apply(func, [null, fakeArg]);
       },
       {
@@ -203,7 +197,6 @@ describe('promisify', () => {
   });
 
   it('should ignore singular when multiple args are present', () => {
-    // tslint:disable-next-line:no-any
     const fakeArgs: any[] = ['a', 'b'];
 
     func = util.promisify(
@@ -263,7 +256,6 @@ describe('callbackifyAll', () => {
   const fakeArgs = [1, 2, 3];
   const fakeError = new Error('err.');
 
-  // tslint:disable-next-line
   let FakeClass: any;
 
   beforeEach(() => {
