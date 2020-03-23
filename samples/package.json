@@ -5,6 +5,7 @@
   "engines": {
     "node": ">=8"
   },
+  "files": [],
   "repository": "googleapis/nodejs-promisify",
   "private": true,
   "scripts": {

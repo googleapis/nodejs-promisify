@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function,prefer-rest-params */
+
 // Copyright 2014 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +15,7 @@
 // limitations under the License.
 
 import * as assert from 'assert';
-import {describe, it, afterEach} from 'mocha';
+import {describe, it, afterEach, beforeEach} from 'mocha';
 import * as sinon from 'sinon';
 import * as util from '../src';
 
@@ -30,7 +32,7 @@ describe('promisifyAll', () => {
   beforeEach(() => {
     FakeClass = class {
       methodName(callback: Function) {
-        callback.apply(null, fakeArgs);
+        callback(...fakeArgs);
       }
       methodSingle(callback: Function) {
         callback(null, fakeArgs[1]);
@@ -131,7 +133,7 @@ describe('promisify', () => {
 
   beforeEach(() => {
     fakeArgs = [null, 1, 2, 3];
-    func = util.promisify(function(this: {}, callback: () => void) {
+    func = util.promisify(function (this: {}, callback: () => void) {
       // tslint:disable-next-line no-any
       (callback as any).apply(this, fakeArgs);
     });
@@ -144,12 +146,14 @@ describe('promisify', () => {
   });
 
   it('should not return a promise in callback mode', done => {
-    let returnVal: {};
-    returnVal = func.call(fakeContext, function(this: {}) {
-      const args = [].slice.call(arguments);
+    // tslint:disable-next-line:no-any
+    let returnVal: any;
+    returnVal = func.call(fakeContext, function (this: {}) {
+      const args = [...arguments];
       assert.deepStrictEqual(args, fakeArgs);
       assert.strictEqual(this, fakeContext);
       assert(!returnVal);
+      returnVal = null; // this is to suppress prefer-const.
       done();
     });
   });
@@ -185,7 +189,7 @@ describe('promisify', () => {
 
     func = util.promisify(
       (callback: () => void) => {
-        // tslint:disable-next-line no-any
+        // tslint:disable-next-line no-any prefer-rest-params
         (callback as any).apply(func, [null, fakeArg]);
       },
       {
@@ -313,7 +317,7 @@ describe('callbackify', () => {
   beforeEach(() => {
     fakeArgs = [1, 2, 3];
 
-    func = util.callbackify(async function(this: {}) {
+    func = util.callbackify(async (_this: {}) => {
       return fakeArgs;
     });
   });
@@ -331,7 +335,7 @@ describe('callbackify', () => {
   });
 
   it('should call the callback if it is provided', done => {
-    func(function(this: {}) {
+    func(function (this: {}) {
       const args = [].slice.call(arguments);
       assert.deepStrictEqual(args, [null, ...fakeArgs]);
       done();
@@ -339,7 +343,7 @@ describe('callbackify', () => {
   });
 
   it('should call the provided callback with undefined', done => {
-    func = util.callbackify(async function(this: {}) {});
+    func = util.callbackify(async (_this: {}) => {});
     func((err: Error, resp: {}) => {
       assert.strictEqual(err, null);
       assert.strictEqual(resp, undefined);
@@ -348,10 +352,10 @@ describe('callbackify', () => {
   });
 
   it('should call the provided callback with null', done => {
-    func = util.callbackify(async function(this: {}) {
+    func = util.callbackify(async (_this: {}) => {
       return null;
     });
-    func(function(this: {}) {
+    func(function (this: {}) {
       const args = [].slice.call(arguments);
       assert.deepStrictEqual(args, [null, null]);
       done();
