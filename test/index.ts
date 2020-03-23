@@ -370,13 +370,15 @@ describe('callbackify', () => {
     const error = new Error('err');
     const callback = sinon.stub().throws(error);
     const originalRejection = process.listeners('unhandledRejection').pop();
-    if (originalRejection)
+    if (originalRejection) {
       process.removeListener('unhandledRejection', originalRejection!);
+    }
     process.once('unhandledRejection', err => {
       assert.strictEqual(error, err);
       assert.ok(callback.calledOnce);
-      if (originalRejection)
+      if (originalRejection) {
         process.listeners('unhandledRejection').push(originalRejection!);
+      }
     });
     func(callback);
   });
