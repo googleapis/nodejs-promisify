@@ -1,5 +1,3 @@
-/* eslint-disable prefer-rest-params */
-
 // Copyright 2014 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,7 +66,8 @@ export function promisify(
   const slice = Array.prototype.slice;
 
   // tslint:disable-next-line:no-any
-  const wrapper: any = function (this: WithPromise) {
+  const wrapper: any = function(this: WithPromise) {
+    const context = this;
     let last;
 
     for (last = arguments.length - 1; last >= 0; last--) {
@@ -82,7 +81,7 @@ export function promisify(
         break; // non-callback last argument found.
       }
 
-      return originalMethod.apply(this, arguments);
+      return originalMethod.apply(context, arguments);
     }
 
     // peel trailing undefined.
@@ -94,8 +93,8 @@ export function promisify(
     // Because dedupe will likely create a single install of
     // @google-cloud/common to be shared amongst all modules, we need to
     // localize it at the Service level.
-    if (this && this.Promise) {
-      PromiseCtor = this.Promise;
+    if (context && context.Promise) {
+      PromiseCtor = context.Promise;
     }
 
     return new PromiseCtor((resolve, reject) => {
@@ -115,7 +114,7 @@ export function promisify(
         }
       });
 
-      originalMethod.apply(this, args);
+      originalMethod.apply(context, args);
     });
   };
 
@@ -166,14 +165,16 @@ export function callbackify(originalMethod: CallbackMethod) {
   }
 
   // tslint:disable-next-line:no-any
-  const wrapper = function (this: any) {
+  const wrapper = function(this: any) {
+    const context = this;
+
     if (typeof arguments[arguments.length - 1] !== 'function') {
-      return originalMethod.apply(this, arguments);
+      return originalMethod.apply(context, arguments);
     }
 
     const cb = Array.prototype.pop.call(arguments);
 
-    originalMethod.apply(this, arguments).then(
+    originalMethod.apply(context, arguments).then(
       // tslint:disable-next-line:no-any
       (res: any) => {
         res = Array.isArray(res) ? res : [res];

@@ -36,14 +36,11 @@ module.exports = {
     includePattern: '\\.js$'
   },
   templates: {
-    copyright: 'Copyright 2019 Google, LLC.',
+    copyright: 'Copyright 2018 Google, LLC.',
     includeDate: false,
     sourceFiles: false,
     systemName: '@google-cloud/promisify',
-    theme: 'lumen',
-    default: {
-      "outputSourceFiles": false
-    }
+    theme: 'lumen'
   },
   markdown: {
     idInHeadings: true

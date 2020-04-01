@@ -24,3 +24,4 @@ describe('quickstart samples', () => {
     assert.include(stdout, 'Well hello there, nodestronaut!');
   });
 });
+

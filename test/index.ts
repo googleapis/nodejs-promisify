@@ -12,26 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable @typescript-eslint/no-empty-function,prefer-rest-params */
-
 import * as assert from 'assert';
-import {describe, it, afterEach, beforeEach} from 'mocha';
+import {describe, it} from 'mocha';
+import * as mocha from 'mocha';
 import * as sinon from 'sinon';
+
 import * as util from '../src';
 
 const noop = () => {};
 const sandbox = sinon.createSandbox();
 
+afterEach(() => {
+  sandbox.restore();
+});
+
 describe('promisifyAll', () => {
   const fakeArgs = [null, 1, 2, 3];
   const fakeError = new Error('err.');
 
+  // tslint:disable-next-line
   let FakeClass: any;
 
   beforeEach(() => {
     FakeClass = class {
       methodName(callback: Function) {
-        callback(...fakeArgs);
+        callback.apply(null, fakeArgs);
       }
       methodSingle(callback: Function) {
         callback(null, fakeArgs[1]);
@@ -47,10 +52,6 @@ describe('promisifyAll', () => {
 
     util.promisifyAll(FakeClass);
     const fc = new FakeClass();
-  });
-
-  afterEach(() => {
-    sandbox.restore();
   });
 
   it('should promisify the correct method', () => {
@@ -84,6 +85,7 @@ describe('promisifyAll', () => {
       });
     `);
   } catch (error) {
+    // tslint:disable-next-line ban
     it.skip('should work on ES classes');
   }
 
@@ -127,11 +129,14 @@ describe('promisifyAll', () => {
 describe('promisify', () => {
   const fakeContext = {};
   let func: Function;
-  let fakeArgs: Array<Error | number | null>;
+  // tslint:disable-next-line:no-any
+  let fakeArgs: any[];
 
   beforeEach(() => {
     fakeArgs = [null, 1, 2, 3];
-    func = util.promisify(function (this: {}, callback: () => void) {
+
+    func = util.promisify(function(this: {}, callback: () => void) {
+      // tslint:disable-next-line no-any
       (callback as any).apply(this, fakeArgs);
     });
   });
@@ -143,13 +148,12 @@ describe('promisify', () => {
   });
 
   it('should not return a promise in callback mode', done => {
-    let returnVal: any;
-    returnVal = func.call(fakeContext, function (this: {}) {
-      const args = [...arguments];
+    let returnVal: {};
+    returnVal = func.call(fakeContext, function(this: {}) {
+      const args = [].slice.call(arguments);
       assert.deepStrictEqual(args, fakeArgs);
       assert.strictEqual(this, fakeContext);
       assert(!returnVal);
-      returnVal = null; // this is to suppress prefer-const.
       done();
     });
   });
@@ -174,6 +178,7 @@ describe('promisify', () => {
   });
 
   it('should allow the Promise object to be overridden', () => {
+    // tslint:disable-next-line:variable-name
     const FakePromise = class {};
     const promise = func.call({Promise: FakePromise});
     assert(promise instanceof FakePromise);
@@ -184,6 +189,7 @@ describe('promisify', () => {
 
     func = util.promisify(
       (callback: () => void) => {
+        // tslint:disable-next-line no-any
         (callback as any).apply(func, [null, fakeArg]);
       },
       {
@@ -197,6 +203,7 @@ describe('promisify', () => {
   });
 
   it('should ignore singular when multiple args are present', () => {
+    // tslint:disable-next-line:no-any
     const fakeArgs: any[] = ['a', 'b'];
 
     func = util.promisify(
@@ -256,6 +263,7 @@ describe('callbackifyAll', () => {
   const fakeArgs = [1, 2, 3];
   const fakeError = new Error('err.');
 
+  // tslint:disable-next-line
   let FakeClass: any;
 
   beforeEach(() => {
@@ -304,12 +312,13 @@ describe('callbackifyAll', () => {
 
 describe('callbackify', () => {
   let func: Function;
-  let fakeArgs: number[];
+  // tslint:disable-next-line:no-any
+  let fakeArgs: any[];
 
   beforeEach(() => {
     fakeArgs = [1, 2, 3];
 
-    func = util.callbackify(async (_this: {}) => {
+    func = util.callbackify(async function(this: {}) {
       return fakeArgs;
     });
   });
@@ -327,7 +336,7 @@ describe('callbackify', () => {
   });
 
   it('should call the callback if it is provided', done => {
-    func(function (this: {}) {
+    func(function(this: {}) {
       const args = [].slice.call(arguments);
       assert.deepStrictEqual(args, [null, ...fakeArgs]);
       done();
@@ -335,8 +344,9 @@ describe('callbackify', () => {
   });
 
   it('should call the provided callback with undefined', done => {
-    func = util.callbackify(async (_this: {}) => {});
-    func((err: Error, resp: {}) => {
+    func = util.callbackify(async function(this: {}) {});
+    // tslint:disable-next-line:no-any
+    func((err: Error, resp: any) => {
       assert.strictEqual(err, null);
       assert.strictEqual(resp, undefined);
       done();
@@ -344,10 +354,10 @@ describe('callbackify', () => {
   });
 
   it('should call the provided callback with null', done => {
-    func = util.callbackify(async (_this: {}) => {
+    func = util.callbackify(async function(this: {}) {
       return null;
     });
-    func(function (this: {}) {
+    func(function(this: {}) {
       const args = [].slice.call(arguments);
       assert.deepStrictEqual(args, [null, null]);
       done();
@@ -365,17 +375,15 @@ describe('callbackify', () => {
   it('should call the callback only a single time when the promise resolves but callback throws an error', () => {
     const error = new Error('err');
     const callback = sinon.stub().throws(error);
+
     const originalRejection = process.listeners('unhandledRejection').pop();
-    if (originalRejection) {
-      process.removeListener('unhandledRejection', originalRejection!);
-    }
+    process.removeListener('unhandledRejection', originalRejection!);
     process.once('unhandledRejection', err => {
       assert.strictEqual(error, err);
       assert.ok(callback.calledOnce);
-      if (originalRejection) {
-        process.listeners('unhandledRejection').push(originalRejection!);
-      }
+      process.listeners('unhandledRejection').push(originalRejection!);
     });
+
     func(callback);
   });
 });
