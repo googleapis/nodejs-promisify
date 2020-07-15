@@ -4,7 +4,7 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/nodejs-promisify.git",
-        "sha": "2f7da82a601c882256cdf5d796221aa66bb1cc14"
+        "sha": "6fb3ba29e477103a44604df84e2cd5f8d5050b2d"
       }
     },
     {
