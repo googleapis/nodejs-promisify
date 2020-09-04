@@ -103,6 +103,7 @@ describe('promisifyAll', () => {
     Object.defineProperty(FakeClass2.prototype, 'method', {
       get: () => {
         done(new Error('Accessor method should not be called.'));
+        return {};
       },
     });
     assert.doesNotThrow(() => {
@@ -315,6 +316,7 @@ describe('callbackifyAll', () => {
     Object.defineProperty(FakeClass2.prototype, 'method', {
       get: () => {
         done(new Error('Accessor method should not be called.'));
+        return {};
       },
     });
     assert.doesNotThrow(() => {
