@@ -7,5 +7,5 @@ logging.basicConfig(level=logging.DEBUG)
 common_templates = gcp.CommonTemplates()
 templates = common_templates.node_library()
 s.copy(templates)
-node.install()
-node.fix()
+
+node.postprocess_gapic_library_hermetic()
