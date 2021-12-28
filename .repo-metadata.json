@@ -7,5 +7,5 @@
   "name_pretty": "Google Cloud Common Promisify",
   "name": "promisify",
   "api_shortname": "promisify",
-  "library_type": ""
+  "library_type": "GAPIC_AUTO"
 }
