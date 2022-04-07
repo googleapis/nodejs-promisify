@@ -77,6 +77,9 @@ It's unlikely you will need to install this package directly, as it will be
 installed as a dependency when you install other `@google-cloud` packages.
 
 
+
+This library is built on top of google-gax as its transport layer. To customize the common behavior of this client library (timeout, retry, etc), see [Client Library Howto](https://github.com/googleapis/gax-nodejs/blob/main/client-libraries.md).
+
 ## Samples
 
 Samples are in the [`samples/`](https://github.com/googleapis/nodejs-promisify/tree/main/samples) directory. Each sample's `README.md` has instructions for running its sample.
