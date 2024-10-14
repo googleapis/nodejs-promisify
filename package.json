@@ -30,7 +30,7 @@
   "author": "Google Inc.",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@compodoc/compodoc": "1.1.19",
+    "@compodoc/compodoc": "1.1.26",
     "@types/mocha": "^9.0.0",
     "@types/node": "^20.4.8",
     "@types/sinon": "^17.0.0",
