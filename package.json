@@ -41,7 +41,7 @@
     "jsdoc": "^4.0.4",
     "jsdoc-fresh": "^3.0.0",
     "jsdoc-region-tag": "^3.0.0",
-    "linkinator": "^6.1.2",
+    "linkinator": "^7.5.0",
     "mocha": "^11.1.0",
     "sinon": "^19.0.2",
     "typescript": "^5.8.2"
